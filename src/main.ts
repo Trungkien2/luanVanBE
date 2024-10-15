@@ -11,7 +11,16 @@ async function bootstrap() {
   const config = new DocumentBuilder()
   .setTitle('Luận văn swagger API')
   .setDescription('The SnapGrams API description')
-  .setVersion('1.0')
+  .setVersion('1.0') .addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+      in: 'header',
+    },
+    'JWT-auth', 
+  )
   .build();
   const app = await NestFactory.create(AppModule, appOptions);
   //global prefix
