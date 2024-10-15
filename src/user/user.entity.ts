@@ -1,6 +1,8 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, AllowNull, CreatedAt, UpdatedAt } from 'sequelize-typescript';
 
-@Table
+@Table({
+  tableName: 'tbl_user',
+})
 export class User extends Model<User> {
   @Column({
     type: DataType.STRING,
@@ -22,8 +24,32 @@ export class User extends Model<User> {
 
   @Column({
     type: DataType.ENUM,
-    values: ['male', 'female'],
-    allowNull: false,
+    values: ['MALE', 'FEMALE'],
+    allowNull: true,
   })
   gender: string;
+
+  @Column({
+    type : DataType.STRING,
+    allowNull : true
+  })
+  bio: string;
+
+  @Column({
+    type: DataType.BIGINT,
+    defaultValue: 0,
+  })
+  created_at_unix_timestamp: number;
+  @Column({
+    type: DataType.BIGINT,
+    defaultValue: 0,
+  })
+  updated_at_unix_timestamp: number;
+
+  @Column({
+    type: DataType.DATE,
+  })
+  deleted_at: string;
+
+ 
 }

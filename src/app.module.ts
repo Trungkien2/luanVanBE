@@ -11,12 +11,14 @@ import { DatabaseModule } from './core/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { LogsMiddleware, QueryMiddleware } from './core/middlewares';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     DatabaseModule,
     ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
