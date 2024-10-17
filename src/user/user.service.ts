@@ -1,6 +1,6 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { User } from './user.entity';
+import { Injectable } from '@nestjs/common';
 import { CrudService } from 'src/core/Base/crud.service';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService  extends CrudService<User> {

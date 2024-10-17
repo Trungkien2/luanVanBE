@@ -1,4 +1,12 @@
-import { Table, Column, Model, DataType, AllowNull, CreatedAt, UpdatedAt } from 'sequelize-typescript';
+import {
+  AllowNull,
+  Column,
+  DataType,
+  Default,
+  Model,
+  PrimaryKey,
+  Table
+} from 'sequelize-typescript';
 
 @Table({
   tableName: 'tbl_user',
@@ -9,6 +17,7 @@ export class User extends Model<User> {
     allowNull: false,
   })
   name: string;
+
   @Column({
     type: DataType.STRING,
     unique: true,
@@ -28,18 +37,31 @@ export class User extends Model<User> {
     allowNull: true,
   })
   gender: string;
-
   @Column({
-    type : DataType.STRING,
-    allowNull : true
+    type: DataType.ENUM,
+    values: ['IN_APP', 'GOOGLE'],
+    allowNull: true,
+    defaultValue : 'IN_APP'
+  })
+  account_type: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
   })
   bio: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  picture: string;
 
   @Column({
     type: DataType.BIGINT,
     defaultValue: 0,
   })
   created_at_unix_timestamp: number;
+
   @Column({
     type: DataType.BIGINT,
     defaultValue: 0,
@@ -50,6 +72,4 @@ export class User extends Model<User> {
     type: DataType.DATE,
   })
   deleted_at: string;
-
- 
 }
