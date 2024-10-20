@@ -38,3 +38,19 @@ export class LoginUserDTO {
   @MinLength(8) // Ensures password has at least 6 characters
   readonly password : string;
 }
+
+
+export class MailOTPDTO{
+  @ApiProperty({ description: 'Email of the user' }) // Swagger decorator
+  @IsEmail() // Validator for email format
+  @IsNotEmpty() // Ensures the field is not empty
+  readonly email : string;
+}
+
+export class OTPCodeDTO{
+  @ApiProperty({ description: 'OTP code to verify' }) // Swagger decorator
+  
+  @IsNotEmpty() // Ensures the field is not empty
+  readonly otp : string;
+
+}

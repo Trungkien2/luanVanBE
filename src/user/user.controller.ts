@@ -16,6 +16,8 @@ export class UserController extends CrudController<UserService> {
   getProfile() {
     return { message: 'This is a protected route' };
   }
+
+  
 }
 
 

@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './stragery/jwt.stragery';
 import { GoogleStrategy } from './stragery/google.strategy';
 import { usersProviders } from 'src/user/user.providers';
+import { EmailModule } from 'src/mail/mail.module';
 
 @Module({
   controllers: [AuthController],
@@ -17,6 +18,7 @@ import { usersProviders } from 'src/user/user.providers';
     JwtModule.register({
       global: true,
     }),
+    EmailModule
   ],
 })
 export class AuthModule {}

@@ -8,6 +8,7 @@ import { Repository } from 'sequelize-typescript';
 import { USER_REPOSITORY } from 'src/core/contants';
 import { BaseException } from 'src/core/exception';
 import { EXCEPTION } from 'src/core/exception/exception';
+import { EmailService } from 'src/mail/mail.service';
 import { LoginUserDTO, SignUpUserDTO } from 'src/user/user.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -20,6 +21,7 @@ export class AuthService {
     private configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheService: Cache,
     @Inject(USER_REPOSITORY) private readonly userRepository: Repository<User>,
+    private readonly emailService: EmailService
   ) {}
 
   async signUp(signUpUserDTO: SignUpUserDTO) {

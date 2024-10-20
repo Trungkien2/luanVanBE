@@ -10,4 +10,12 @@ export class UserService  extends CrudService<User> {
   async findByEmail(email: string): Promise<User | null> {
     return User.findOne({ where: { email } });
   }
+
+  async updatePassWord({email,newPassword}:{email : string,newPassword : string}): Promise<any>{
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 }

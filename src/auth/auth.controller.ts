@@ -13,15 +13,16 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginUserDTO, SignUpUserDTO } from 'src/user/user.dto';
+import { LoginUserDTO, MailOTPDTO, OTPCodeDTO, SignUpUserDTO } from 'src/user/user.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { EmailService } from 'src/mail/mail.service';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,    private readonly emailService: EmailService) {}
 
   @Post('/sign-up')
   @ApiBody({ type: SignUpUserDTO })
@@ -45,4 +46,31 @@ export class AuthController {
 
     res.redirect('http://localhost:3000?user=' + JSON.stringify(user));
   }
+
+  @Post('send-otp')
+  @ApiBody({type :MailOTPDTO })
+  async sendOtp(@Body('email') email: string) {
+    // Generate a random OTP (you can change this logic as per your needs)
+    const otp = this.generateOtp();
+
+    // Send the OTP via email
+    await this.emailService.sendOtpEmail(email, otp);
+
+    // Optionally, store the OTP in the database or cache for validation
+    return {
+      message: 'OTP sent successfully',
+      email,
+      otp, // For testing purposes (remove in production)
+    };
+  }
+  @Post('verify-otp')
+  @ApiBody({type : OTPCodeDTO})
+  async verifyOTP(@Body('otp') otp:string){
+    return this.emailService.verifyOtp(otp)
+  }
+
+  private generateOtp(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit OTP
+  }
+
 }

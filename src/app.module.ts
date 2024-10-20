@@ -13,6 +13,8 @@ import { UserModule } from './user/user.module';
 import { LogsMiddleware, QueryMiddleware } from './core/middlewares';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { EmailService } from './mail/mail.service';
+import { EmailModule } from './mail/mail.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -27,9 +29,10 @@ import * as redisStore from 'cache-manager-redis-store';
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
     }),
+    EmailModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EmailService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
