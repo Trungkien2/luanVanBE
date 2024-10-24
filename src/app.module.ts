@@ -20,6 +20,10 @@ import { APP_FILTER } from '@nestjs/core';
 import { BaseExceptionFilter } from './core/filters/BaseExceptionFilter.filter';
 import { UploadModule } from './upload/upload.module';
 import { PostModule } from './post/post.module';
+import { UserSettingModule } from './user-setting/user-setting.module';
+import { FavoriteModule } from './favorite/favorite.module';
+import { FollowModule } from './follow/follow.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -36,6 +40,10 @@ import { PostModule } from './post/post.module';
     EmailModule,
     UploadModule,
     PostModule,
+    UserSettingModule,
+    FavoriteModule,
+    FollowModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [
