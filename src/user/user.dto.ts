@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class UserDTO {
   readonly name: string;
@@ -8,7 +8,6 @@ export class UserDTO {
   readonly gender: string;
   readonly bio: string;
 }
-
 
 export class SignUpUserDTO {
   @ApiProperty({ description: 'Name of the user' }) // Swagger decorator
@@ -31,26 +30,32 @@ export class LoginUserDTO {
   @ApiProperty({ description: 'Email of the user' }) // Swagger decorator
   @IsEmail() // Validator for email format
   @IsNotEmpty() // Ensures the field is not empty
-  readonly email : string;
+  readonly email: string;
   @ApiProperty({ description: 'Password of the user', minLength: 6 }) // Swagger decorator with additional metadata
   @IsString() // Validator for string type
   @IsNotEmpty() // Ensures the field is not empty
   @MinLength(8) // Ensures password has at least 6 characters
-  readonly password : string;
+  readonly password: string;
 }
 
-
-export class MailOTPDTO{
+export class MailOTPDTO {
   @ApiProperty({ description: 'Email of the user' }) // Swagger decorator
   @IsEmail() // Validator for email format
   @IsNotEmpty() // Ensures the field is not empty
-  readonly email : string;
+  readonly email: string;
 }
 
-export class OTPCodeDTO{
+export class OTPCodeDTO {
   @ApiProperty({ description: 'OTP code to verify' }) // Swagger decorator
-  
   @IsNotEmpty() // Ensures the field is not empty
-  readonly otp : string;
+  readonly otp: string;
+}
 
+export class updatePasswordDTO {
+  @ApiProperty({ description: 'Enail of the user ' }) // Swagger decorator
+  @IsNotEmpty() // Ensures the field is not empty
+  readonly email: string;
+  @ApiProperty({ description: 'password user update' }) // Swagger decorator
+  @IsNotEmpty() // Ensures the field is not empty
+  readonly password: string;
 }

@@ -1,7 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 
 export const EXCEPTION = {
-
   // DEFUALT DATABASE
   RECORD_NOT_FOUND: {
     message: {
@@ -90,14 +89,22 @@ export const EXCEPTION = {
   },
 
   // USER
-  USER_CREATED :{
+  USER_CREATED: {
     message: {
       en: 'User registered successfully',
-    
     },
     httpCode: HttpStatus.CREATED,
     statusCode: HttpStatus.CREATED,
     type: 'user_created',
+  },
+
+  USER_CHANGEPASSWORD: {
+    message: {
+      en: 'User change successfully',
+    },
+    httpCode: HttpStatus.OK,
+    statusCode: HttpStatus.OK,
+    type: 'user_change_password',
   },
   USERNAME_ALREADY_REGISTERED: {
     message: {
@@ -216,8 +223,6 @@ export const EXCEPTION = {
     statusCode: HttpStatus.BAD_REQUEST,
     type: 'delete_account',
   },
-
-
 
   // EMPLOYEE
   ADMIN_EMAIL_DOSE_NOT_EXIST: {

@@ -11,14 +11,14 @@ import { EmailModule } from 'src/mail/mail.module';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService,JwtStrategy,GoogleStrategy, ...usersProviders],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, ...usersProviders],
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UserModule,
     JwtModule.register({
       global: true,
     }),
-    EmailModule
+    EmailModule,
   ],
 })
 export class AuthModule {}

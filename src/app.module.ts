@@ -16,6 +16,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { EmailService } from './mail/mail.service';
 import { EmailModule } from './mail/mail.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { APP_FILTER } from '@nestjs/core';
+import { BaseExceptionFilter } from './core/filters/BaseExceptionFilter.filter';
 
 @Module({
   imports: [
@@ -32,7 +34,14 @@ import * as redisStore from 'cache-manager-redis-store';
     EmailModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [
+    AppService,
+    EmailService,
+    {
+      provide: APP_FILTER,
+      useClass: BaseExceptionFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

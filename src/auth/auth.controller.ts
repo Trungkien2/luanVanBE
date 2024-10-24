@@ -1,28 +1,36 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
-  CacheTTL,
   Controller,
-  Delete,
   Get,
-  Param,
-  Patch,
   Post,
   Req,
   Res,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginUserDTO, MailOTPDTO, OTPCodeDTO, SignUpUserDTO } from 'src/user/user.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { BaseExceptionFilter } from 'src/core/filters/BaseExceptionFilter.filter';
 import { EmailService } from 'src/mail/mail.service';
+import {
+  LoginUserDTO,
+  MailOTPDTO,
+  OTPCodeDTO,
+  SignUpUserDTO,
+} from 'src/user/user.dto';
+import { AuthService } from './auth.service';
+
 @ApiTags('Auth')
 @Controller('auth')
+@UseFilters(BaseExceptionFilter)
 export class AuthController {
-  constructor(private readonly authService: AuthService,    private readonly emailService: EmailService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @Post('/sign-up')
   @ApiBody({ type: SignUpUserDTO })
@@ -37,8 +45,9 @@ export class AuthController {
   @Get('/google')
   @UseInterceptors(CacheInterceptor)
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req: Request) {}
-  
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async googleAuth() {}
+
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
@@ -48,7 +57,7 @@ export class AuthController {
   }
 
   @Post('send-otp')
-  @ApiBody({type :MailOTPDTO })
+  @ApiBody({ type: MailOTPDTO })
   async sendOtp(@Body('email') email: string) {
     // Generate a random OTP (you can change this logic as per your needs)
     const otp = this.generateOtp();
@@ -64,13 +73,12 @@ export class AuthController {
     };
   }
   @Post('verify-otp')
-  @ApiBody({type : OTPCodeDTO})
-  async verifyOTP(@Body('otp') otp:string){
-    return this.emailService.verifyOtp(otp)
+  @ApiBody({ type: OTPCodeDTO })
+  async verifyOTP(@Body('otp') otp: string) {
+    return this.emailService.verifyOtp(otp);
   }
 
   private generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit OTP
   }
-
 }

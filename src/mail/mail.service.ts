@@ -1,14 +1,17 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
 import { Cache } from 'cache-manager';
 
 @Injectable()
 export class EmailService {
-  constructor(  @Inject(CACHE_MANAGER) private cacheService: Cache,) {
+  constructor(@Inject(CACHE_MANAGER) private cacheService: Cache) {
     // Load SendGrid API key from environment variables
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  
   }
 
   async sendOtpEmail(to: string, otp: string): Promise<void> {
@@ -21,17 +24,15 @@ export class EmailService {
     };
 
     try {
-     await sgMail.send(msg);
+      await sgMail.send(msg);
 
-     
-          // Cache giá trị trong Redis
-          await this.cacheService.set(
-            `otp:${otp}`,
-            JSON.stringify(otp),
-            300000 // casche trong 5p
-          );
-        
-   
+      // Cache giá trị trong Redis
+      await this.cacheService.set(
+        `otp:${otp}`,
+        JSON.stringify(otp),
+        300000, // casche trong 5p
+      );
+
       console.log('OTP email sent successfully');
     } catch (error) {
       console.error('Error sending OTP email:', error.response.body.errors);
@@ -39,13 +40,12 @@ export class EmailService {
     }
   }
 
-
-  async verifyOtp(otp : string){
+  async verifyOtp(otp: string) {
     const storedOtp = await this.cacheService.get(`otp:${otp}`);
     if (storedOtp === otp) {
-        // OTP hợp lệ
-        return true;
-      }
-      return false; // OTP không hợp lệ
+      // OTP hợp lệ
+      return true;
+    }
+    return false; // OTP không hợp lệ
   }
 }

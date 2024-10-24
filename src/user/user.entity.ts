@@ -1,12 +1,4 @@
-import {
-  AllowNull,
-  Column,
-  DataType,
-  Default,
-  Model,
-  PrimaryKey,
-  Table
-} from 'sequelize-typescript';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({
   tableName: 'tbl_user',
@@ -41,7 +33,7 @@ export class User extends Model<User> {
     type: DataType.ENUM,
     values: ['IN_APP', 'GOOGLE'],
     allowNull: true,
-    defaultValue : 'IN_APP'
+    defaultValue: 'IN_APP',
   })
   account_type: string;
   @Column({

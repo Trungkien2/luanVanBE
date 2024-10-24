@@ -30,10 +30,6 @@ export class CrudController<T extends CrudService<any>> {
   @Get()
   @ApiQueryInfo()
   async getAll(@QueryInfo() queryInfo: QueryInfoDto) {
-    console.log(
-      '🚀 ~ file: crud.controller.ts:40 ~ CrudController<T ~ queryInfo',
-      queryInfo,
-    );
     return await this.service.getList(queryInfo);
   }
 
