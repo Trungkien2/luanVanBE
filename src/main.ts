@@ -7,6 +7,7 @@ import { UploadModule } from './upload/upload.module';
 
 import * as express from 'express';
 import { join } from 'path';
+import { PostModule } from './post/post.module';
 async function bootstrap() {
   const appOptions = {
     cors: true,
@@ -30,7 +31,7 @@ async function bootstrap() {
   //global prefix
   app.setGlobalPrefix('api/v1');
   const document = SwaggerModule.createDocument(app, config, {
-    include: [AuthModule, UserModule, UploadModule],
+    include: [AuthModule, UserModule, UploadModule, PostModule],
   });
   SwaggerModule.setup('api', app, document);
   app.enableCors();

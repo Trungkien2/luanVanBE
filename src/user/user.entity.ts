@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { Post } from 'src/post/entities/post.entity';
 
 @Table({
   tableName: 'tbl_user',
@@ -64,4 +65,7 @@ export class User extends Model<User> {
     type: DataType.DATE,
   })
   deleted_at: string;
+
+  @HasMany(() => Post)
+  posts: Post[];
 }

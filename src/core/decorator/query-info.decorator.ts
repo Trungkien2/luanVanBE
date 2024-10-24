@@ -47,7 +47,7 @@ export class QueryDto {
 
   @ApiProperty({
     name: 'order',
-    default: '[["created_at","DESC"]]',
+    default: '[["createdAt","DESC"]]',
     required: false,
   })
   order: string;

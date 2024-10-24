@@ -118,6 +118,7 @@ export class CrudService<T extends Model<T>> {
 
       return result;
     } catch (err) {
+      console.log('🚀 ~ CrudService<T ~ err:', err);
       throw new RouterException(EXCEPTION.SORRY_SOMETHING_WENT_WRONG);
     }
   }

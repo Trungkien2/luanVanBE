@@ -41,7 +41,6 @@ export class CrudController<T extends CrudService<any>> {
     return await this.service.getItem(queryInfo);
   }
   @ApiBearerAuth()
-  @ApiQueryInfo()
   @Post()
   async create(@Body() body: any) {
     return await this.service.create(body);

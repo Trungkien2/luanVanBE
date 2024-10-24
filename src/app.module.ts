@@ -19,6 +19,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { APP_FILTER } from '@nestjs/core';
 import { BaseExceptionFilter } from './core/filters/BaseExceptionFilter.filter';
 import { UploadModule } from './upload/upload.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { UploadModule } from './upload/upload.module';
     }),
     EmailModule,
     UploadModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [
