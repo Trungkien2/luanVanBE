@@ -1,34 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { FollowService } from './follow.service';
-import { CreateFollowDto } from './dto/create-follow.dto';
-import { UpdateFollowDto } from './dto/update-follow.dto';
+import { CrudController } from 'src/core/Base/crud.controller';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
 
 @Controller('follow')
-export class FollowController {
-  constructor(private readonly followService: FollowService) {}
-
-  @Post()
-  create(@Body() createFollowDto: CreateFollowDto) {
-    return this.followService.create(createFollowDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.followService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.followService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFollowDto: UpdateFollowDto) {
-    return this.followService.update(+id, updateFollowDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.followService.remove(+id);
+@ApiTags('Follow')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
+export class FollowController extends CrudController<FollowService> {
+  constructor(private readonly followService: FollowService) {
+    super(followService);
   }
 }

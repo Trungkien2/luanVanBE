@@ -5,7 +5,7 @@ import { FavoriteService } from './favorite.service';
 import { CrudController } from 'src/core/Base/crud.controller';
 
 @Controller('favorite')
-@ApiTags('favorite')
+@ApiTags('Favorite')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard)
 export class FavoriteController extends CrudController<FavoriteService> {
