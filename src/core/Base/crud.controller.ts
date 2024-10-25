@@ -1,25 +1,12 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpException,
-  Logger,
-  Param,
-  Post,
-  Put,
-  Query,
-  Req,
-  Request,
-} from '@nestjs/common';
+import { Body, Delete, Get, Logger, Param, Post, Put } from '@nestjs/common';
 
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
-import { QueryInfoDto } from '../interface/query-info.dto';
-import { CrudService } from './crud.service';
+import { PublicPrivate } from '../decorator/public-private.decorator';
 import { Public } from '../decorator/public.decorator';
 import { ApiQueryInfo, QueryInfo } from '../decorator/query-info.decorator';
-import { PublicPrivate } from '../decorator/public-private.decorator';
+import { QueryInfoDto } from '../interface/query-info.dto';
+import { CrudService } from './crud.service';
 
 @ApiBearerAuth()
 export class CrudController<T extends CrudService<any>> {
@@ -48,20 +35,14 @@ export class CrudController<T extends CrudService<any>> {
 
   @ApiBearerAuth()
   @ApiQueryInfo()
-  @Put('')
-  async updateAll(@Body() body: any, @QueryInfo() queryInfo: QueryInfoDto) {
-    return await this.service.update(body, queryInfo);
-  }
-
-  @ApiBearerAuth()
-  @ApiQueryInfo()
   @Put('bulk-update')
   async bulkUpdate(@Body() body: any, @QueryInfo() queryInfo: QueryInfoDto) {
     return await this.service.bulkUpdate(body, queryInfo);
   }
 
   @ApiBearerAuth()
-  @ApiQueryInfo()
+  // @ApiQueryInfo()
+  @ApiBody({})
   @Put(':id')
   async updateItem(
     @Body() body: any,
@@ -73,14 +54,7 @@ export class CrudController<T extends CrudService<any>> {
   }
 
   @ApiBearerAuth()
-  @ApiQueryInfo()
-  @Delete()
-  async deleteAll(@QueryInfo() queryInfo: QueryInfoDto) {
-    return await this.service.deleteAll(queryInfo);
-  }
-
-  @ApiBearerAuth()
-  @ApiQueryInfo()
+  // @ApiQueryInfo()
   @Delete(':id')
   async deleteItem(
     @Param('id') id: string,

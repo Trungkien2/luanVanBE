@@ -1,34 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
+import { CrudController } from 'src/core/Base/crud.controller';
 import { UserSettingService } from './user-setting.service';
-import { CreateUserSettingDto } from './dto/create-user-setting.dto';
-import { UpdateUserSettingDto } from './dto/update-user-setting.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
 
 @Controller('user-setting')
-export class UserSettingController {
-  constructor(private readonly userSettingService: UserSettingService) {}
-
-  @Post()
-  create(@Body() createUserSettingDto: CreateUserSettingDto) {
-    return this.userSettingService.create(createUserSettingDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.userSettingService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userSettingService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserSettingDto: UpdateUserSettingDto) {
-    return this.userSettingService.update(+id, updateUserSettingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userSettingService.remove(+id);
+@Controller('User Setting')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
+export class UserSettingController extends CrudController<UserSettingService> {
+  constructor(private readonly userSettingService: UserSettingService) {
+    super(userSettingService);
   }
 }

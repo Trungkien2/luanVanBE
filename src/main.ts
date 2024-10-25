@@ -11,6 +11,7 @@ import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { FollowModule } from './follow/follow.module';
+import { UserSettingModule } from './user-setting/user-setting.module';
 async function bootstrap() {
   const appOptions = {
     cors: true,
@@ -42,6 +43,7 @@ async function bootstrap() {
       CommentModule,
       FavoriteModule,
       FollowModule,
+      UserSettingModule,
     ],
   });
   SwaggerModule.setup('api', app, document);

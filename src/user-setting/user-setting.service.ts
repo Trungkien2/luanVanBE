@@ -1,26 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserSettingDto } from './dto/create-user-setting.dto';
-import { UpdateUserSettingDto } from './dto/update-user-setting.dto';
+import { CrudService } from 'src/core/Base/crud.service';
+import { UserSetting } from './entities/user-setting.entity';
 
 @Injectable()
-export class UserSettingService {
-  create(createUserSettingDto: CreateUserSettingDto) {
-    return 'This action adds a new userSetting';
-  }
-
-  findAll() {
-    return `This action returns all userSetting`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} userSetting`;
-  }
-
-  update(id: number, updateUserSettingDto: UpdateUserSettingDto) {
-    return `This action updates a #${id} userSetting`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} userSetting`;
+export class UserSettingService extends CrudService<UserSetting> {
+  constructor() {
+    super(UserSetting);
   }
 }
