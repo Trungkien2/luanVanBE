@@ -1,34 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
 import { FavoriteService } from './favorite.service';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { CrudController } from 'src/core/Base/crud.controller';
 
 @Controller('favorite')
-export class FavoriteController {
-  constructor(private readonly favoriteService: FavoriteService) {}
-
-  @Post()
-  create(@Body() createFavoriteDto: CreateFavoriteDto) {
-    return this.favoriteService.create(createFavoriteDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.favoriteService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoriteService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFavoriteDto: UpdateFavoriteDto) {
-    return this.favoriteService.update(+id, updateFavoriteDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favoriteService.remove(+id);
+@ApiTags('favorite')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
+export class FavoriteController extends CrudController<FavoriteService> {
+  constructor(private readonly favoriteService: FavoriteService) {
+    super(favoriteService);
   }
 }
