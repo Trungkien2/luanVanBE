@@ -24,6 +24,7 @@ import { UserSettingModule } from './user-setting/user-setting.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { FollowModule } from './follow/follow.module';
 import { CommentModule } from './comment/comment.module';
+import { FriendShipModule } from './friend-ship/friend-ship.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { CommentModule } from './comment/comment.module';
     FavoriteModule,
     FollowModule,
     CommentModule,
+    FriendShipModule,
   ],
   controllers: [AppController],
   providers: [
