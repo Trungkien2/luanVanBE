@@ -25,6 +25,7 @@ import { FavoriteModule } from './favorite/favorite.module';
 import { FollowModule } from './follow/follow.module';
 import { CommentModule } from './comment/comment.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
+import { PostReportModule } from './post_report/post_report.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { FriendShipModule } from './friend-ship/friend-ship.module';
     FollowModule,
     CommentModule,
     FriendShipModule,
+    PostReportModule,
   ],
   controllers: [AppController],
   providers: [
