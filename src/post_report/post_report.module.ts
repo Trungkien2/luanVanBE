@@ -4,6 +4,6 @@ import { PostReportController } from './post_report.controller';
 
 @Module({
   controllers: [PostReportController],
-  providers: [PostReportService]
+  providers: [PostReportService],
 })
 export class PostReportModule {}

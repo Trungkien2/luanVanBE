@@ -26,6 +26,7 @@ import { FollowModule } from './follow/follow.module';
 import { CommentModule } from './comment/comment.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
 import { PostReportModule } from './post_report/post_report.module';
+import { BlockedUserModule } from './blocked_user/blocked_user.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { PostReportModule } from './post_report/post_report.module';
     CommentModule,
     FriendShipModule,
     PostReportModule,
+    BlockedUserModule,
   ],
   controllers: [AppController],
   providers: [

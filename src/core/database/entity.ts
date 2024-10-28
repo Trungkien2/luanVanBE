@@ -6,3 +6,4 @@ export * from 'src/follow/entities/follow.entity';
 export * from 'src/user-setting/entities/user-setting.entity';
 export * from 'src/friend-ship/entities/friend-ship.entity';
 export * from 'src/post_report/entities/post_report.entity';
+export * from 'src/blocked_user/entities/blocked_user.entity';
