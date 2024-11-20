@@ -15,6 +15,10 @@ import { UserSettingModule } from './user-setting/user-setting.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
 import { PostReportModule } from './post_report/post_report.module';
 import { BlockedUserModule } from './blocked_user/blocked_user.module';
+import { ConversationsModule } from './conversations/conversations.module';
+import { MessageModule } from './message/message.module';
+import { MessageRead } from './message_reads/entities/message_read.entity';
+import { ConversationMembersModule } from './conversation_members/conversation_members.module';
 async function bootstrap() {
   const appOptions = {
     cors: true,
@@ -50,6 +54,10 @@ async function bootstrap() {
       FriendShipModule,
       PostReportModule,
       BlockedUserModule,
+      ConversationsModule,
+      MessageModule,
+      MessageRead,
+      ConversationMembersModule,
     ],
   });
   SwaggerModule.setup('api', app, document);

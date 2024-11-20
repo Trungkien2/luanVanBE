@@ -4,6 +4,6 @@ import { BlockedUserController } from './blocked_user.controller';
 
 @Module({
   controllers: [BlockedUserController],
-  providers: [BlockedUserService]
+  providers: [BlockedUserService],
 })
 export class BlockedUserModule {}

@@ -1,19 +1,19 @@
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  HasMany,
-  BelongsTo,
 } from 'sequelize-typescript';
+import { Conversation } from 'src/conversations/entities/conversation.entity';
 import { User } from 'src/user/user.entity';
 
 @Table({
-  tableName: 'tbl_post',
-  timestamps: true, // Nếu bạn sử dụng createdAt và updatedAt
+  tableName: 'tbl_message',
+  timestamps: true,
 })
-export class Post extends Model<Post> {
+export class Message extends Model<Message> {
   @Column({
     type: DataType.CHAR(36),
     defaultValue: DataType.UUIDV1,
@@ -25,27 +25,29 @@ export class Post extends Model<Post> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    field: 'user_id',
+    field: 'sender_id',
   })
-  user_id: number;
+  sender_id: number;
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  body: string;
-
+  @ForeignKey(() => Conversation)
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    field: 'conversation_id',
   })
-  media: string;
+  conversation_id: string;
 
   @Column({
-    type: DataType.TEXT,
-    allowNull: false,
+    type: DataType.STRING,
+    allowNull: true,
   })
-  status: string;
+  content: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  message_type: string;
 
   @Column({
     type: DataType.BIGINT,
@@ -70,5 +72,8 @@ export class Post extends Model<Post> {
   deleted_date: Date;
 
   @BelongsTo(() => User)
-  user: User;
+  sender: User;
+
+  @BelongsTo(() => Conversation)
+  conversation: Conversation;
 }

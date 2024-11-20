@@ -1,19 +1,20 @@
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  HasMany,
-  BelongsTo,
 } from 'sequelize-typescript';
+import { Conversation } from 'src/conversations/entities/conversation.entity';
+import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/user.entity';
 
 @Table({
-  tableName: 'tbl_post',
-  timestamps: true, // Nếu bạn sử dụng createdAt và updatedAt
+  tableName: 'tbl_conversation_members',
+  timestamps: true,
 })
-export class Post extends Model<Post> {
+export class ConversationMember extends Model<ConversationMember> {
   @Column({
     type: DataType.CHAR(36),
     defaultValue: DataType.UUIDV1,
@@ -29,23 +30,21 @@ export class Post extends Model<Post> {
   })
   user_id: number;
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  body: string;
-
+  @ForeignKey(() => Conversation)
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    field: 'conversation_id',
   })
-  media: string;
+  conversation_id: string;
 
   @Column({
-    type: DataType.TEXT,
-    allowNull: false,
+    type: DataType.BIGINT,
+    validate: {
+      min: 0,
+    },
   })
-  status: string;
+  joined_at: number;
 
   @Column({
     type: DataType.BIGINT,
@@ -71,4 +70,7 @@ export class Post extends Model<Post> {
 
   @BelongsTo(() => User)
   user: User;
+
+  @BelongsTo(() => Conversation)
+  conversation: Conversation;
 }
