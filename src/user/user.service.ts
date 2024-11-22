@@ -68,4 +68,8 @@ export class UserService extends CrudService<User> {
 
     return new BaseException(EXCEPTION.USER_CHANGEPASSWORD, 'user');
   }
+
+  async getProfile() {
+    return 'profile';
+  }
 }

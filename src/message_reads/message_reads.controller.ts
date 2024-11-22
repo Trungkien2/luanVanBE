@@ -9,7 +9,7 @@ import { MessageReadsService } from './message_reads.service';
 @ApiTags('message-reads')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard)
-export class MessageController extends CrudController<MessageReadsService> {
+export class MessageReadController extends CrudController<MessageReadsService> {
   constructor(private readonly messageReadService: MessageReadsService) {
     super(messageReadService);
   }

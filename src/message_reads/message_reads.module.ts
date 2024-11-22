@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MessageReadsService } from './message_reads.service';
-import { MessageReadsController } from './message_reads.controller';
+import { MessageReadController } from './message_reads.controller';
 
 @Module({
-  controllers: [MessageReadsController],
-  providers: [MessageReadsService]
+  controllers: [MessageReadController],
+  providers: [MessageReadsService],
 })
 export class MessageReadsModule {}
