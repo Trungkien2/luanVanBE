@@ -1,51 +1,35 @@
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  HasMany,
-  BelongsTo,
 } from 'sequelize-typescript';
 import { User } from 'src/user/user.entity';
 
 @Table({
-  tableName: 'tbl_post',
-  timestamps: true, // Nếu bạn sử dụng createdAt và updatedAt
+  tableName: 'tbl_conversations',
+  timestamps: true,
 })
-export class Post extends Model<Post> {
+export class Conversation extends Model<Conversation> {
   @Column({
     type: DataType.CHAR(36),
     defaultValue: DataType.UUIDV1,
     primaryKey: true,
   })
   id: string;
-
-  @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    field: 'user_id',
+    type: DataType.STRING,
+    allowNull: true,
   })
-  user_id: number;
-
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  body: string;
+  type: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
-  media: string;
-
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  status: string;
+  name: string;
 
   @Column({
     type: DataType.BIGINT,
@@ -68,7 +52,4 @@ export class Post extends Model<Post> {
     allowNull: true,
   })
   deleted_date: Date;
-
-  @BelongsTo(() => User)
-  user: User;
 }

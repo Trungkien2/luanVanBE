@@ -7,3 +7,7 @@ export * from 'src/user-setting/entities/user-setting.entity';
 export * from 'src/friend-ship/entities/friend-ship.entity';
 export * from 'src/post_report/entities/post_report.entity';
 export * from 'src/blocked_user/entities/blocked_user.entity';
+export * from 'src/conversations/entities/conversation.entity';
+export * from 'src/message/entities/message.entity';
+export * from 'src/message_reads/entities/message_read.entity';
+export * from 'src/conversation_members/entities/conversation_member.entity';

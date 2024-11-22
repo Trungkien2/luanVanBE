@@ -27,6 +27,10 @@ import { CommentModule } from './comment/comment.module';
 import { FriendShipModule } from './friend-ship/friend-ship.module';
 import { PostReportModule } from './post_report/post_report.module';
 import { BlockedUserModule } from './blocked_user/blocked_user.module';
+import { ConversationsModule } from './conversations/conversations.module';
+import { MessageModule } from './message/message.module';
+import { MessageReadsModule } from './message_reads/message_reads.module';
+import { ConversationMembersModule } from './conversation_members/conversation_members.module';
 
 @Module({
   imports: [
@@ -50,6 +54,10 @@ import { BlockedUserModule } from './blocked_user/blocked_user.module';
     FriendShipModule,
     PostReportModule,
     BlockedUserModule,
+    ConversationsModule,
+    MessageModule,
+    MessageReadsModule,
+    ConversationMembersModule,
   ],
   controllers: [AppController],
   providers: [

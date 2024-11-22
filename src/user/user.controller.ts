@@ -15,8 +15,8 @@ export class UserController extends CrudController<UserService> {
   }
   @UseGuards(JwtAuthGuard)
   @Get('/me')
-  getProfile() {
-    return { message: 'This is a protected route' };
+  getProfile(@Req() req: any) {
+    return this.userService.getProfile();
   }
 
   @Post('/update-password')

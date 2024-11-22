@@ -71,20 +71,29 @@ export class AuthService {
       );
     }
 
-    return this.convertStringToJwt(existingUser.id, existingUser.email);
+    return this.convertStringToJwt(
+      existingUser.id,
+      existingUser.email,
+      existingUser,
+    );
   }
 
   async convertStringToJwt(
     userId: string,
     email: string,
-  ): Promise<{ message: { en: string }; access_token: string }> {
+    userInfo?: User,
+  ): Promise<{
+    message: { en: string };
+    access_token: string;
+    userInfo?: User;
+  }> {
     const payload = {
       sub: userId,
       email,
     };
     const jwtString: string = await this.jwtService.signAsync(payload, {
       expiresIn: '10m',
-      secret: this.configService.get('JWT_SECRET'),
+      secret: process.env.JWT_SECRET || 'defaultSecretKey',
     });
 
     return {
@@ -92,6 +101,7 @@ export class AuthService {
         en: 'Login success',
       },
       access_token: jwtString,
+      userInfo,
     };
   }
 
