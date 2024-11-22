@@ -71,13 +71,22 @@ export class AuthService {
       );
     }
 
-    return this.convertStringToJwt(existingUser.id, existingUser.email);
+    return this.convertStringToJwt(
+      existingUser.id,
+      existingUser.email,
+      existingUser,
+    );
   }
 
   async convertStringToJwt(
     userId: string,
     email: string,
-  ): Promise<{ message: { en: string }; access_token: string }> {
+    userInfo?: User,
+  ): Promise<{
+    message: { en: string };
+    access_token: string;
+    userInfo?: User;
+  }> {
     const payload = {
       sub: userId,
       email,
@@ -92,6 +101,7 @@ export class AuthService {
         en: 'Login success',
       },
       access_token: jwtString,
+      userInfo,
     };
   }
 
