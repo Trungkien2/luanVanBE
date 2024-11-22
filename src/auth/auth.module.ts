@@ -16,6 +16,7 @@ import { EmailModule } from 'src/mail/mail.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UserModule,
     JwtModule.register({
+      secret: process.env.JWT_SECRET || 'defaultSecret',
       global: true,
     }),
     EmailModule,
