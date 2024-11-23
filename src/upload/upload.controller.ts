@@ -75,7 +75,7 @@ export class UploadController {
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     return {
       message: 'Image uploaded successfully',
-      imageUrl: `/src/asset/images/${file.filename}`,
+      imageUrl: `http://localhost:5000/src/asset/images/${file.filename}`,
     };
   }
 

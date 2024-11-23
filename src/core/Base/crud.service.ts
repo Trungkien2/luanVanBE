@@ -40,7 +40,10 @@ export class CrudService<T extends Model<T>> {
       allowNull: false,
     });
 
-    return await this.exec(this.model.findAll(option), {
+    return await this.exec(this.model.findAll({
+      ...option, 
+      attributes: { exclude: ["password"] },
+    }), {
       allowNull: false,
     });
   }
