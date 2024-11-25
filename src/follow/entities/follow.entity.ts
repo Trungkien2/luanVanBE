@@ -3,6 +3,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
@@ -58,6 +59,9 @@ export class Follow extends Model<Follow> {
   })
   deleted_date: Date;
 
-  @BelongsTo(() => User)
-  user: User;
+  @BelongsTo(() => User, 'following_user_id')
+  followerUser: User;
+
+  @BelongsTo(() => User, 'followed_user_id')
+  followedUser: User;
 }

@@ -1,4 +1,5 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { Follow } from 'src/follow/entities/follow.entity';
 import { Post } from 'src/post/entities/post.entity';
 
 @Table({
@@ -73,4 +74,10 @@ export class User extends Model<User> {
 
   @HasMany(() => Post)
   posts: Post[];
+
+  @HasMany(() => Follow, 'following_user_id')
+  following: Follow[];
+
+  @HasMany(() => Follow, 'followed_user_id')
+  followers: Follow[];
 }

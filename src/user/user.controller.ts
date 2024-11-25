@@ -1,10 +1,15 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CrudController } from 'src/core/Base/crud.controller';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
-import { updatePasswordDTO } from './user.dto';
+import { CrudController } from 'src/core/Base/crud.controller';
 import { TransactionRequired } from 'src/core/decorator/transactions.decorator';
+import { updatePasswordDTO } from './user.dto';
+import { UserService } from './user.service';
+import {
+  ApiQueryInfo,
+  QueryInfo,
+} from 'src/core/decorator/query-info.decorator';
+import { QueryInfoDto } from 'src/core/interface/query-info.dto';
 
 @ApiTags('User')
 @ApiBearerAuth('JWT-auth')
@@ -27,7 +32,14 @@ export class UserController extends CrudController<UserService> {
     @Req() req: any,
   ) {
     const transaction = req.transaction;
-    console.log('🚀 ~ UserController ~ transaction:', transaction);
     return this.userService.updatePassWord(updatepasswordbody, transaction);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('/un-follow')
+  @ApiQueryInfo()
+  getUserNotFollow(@QueryInfo() queryInfo: QueryInfoDto, @Req() req: any) {
+    const userId = req.user.userId; // Lấy userId từ req.user
+    queryInfo.where = { ...queryInfo.where, user_id: userId };
+    return this.userService.getUserUnfollow(queryInfo);
   }
 }
