@@ -9,6 +9,7 @@ import { User } from './user.entity';
 import { Op, Transaction } from 'sequelize';
 import { QueryInfoDto } from 'src/core/interface/query-info.dto';
 import { Follow } from 'src/follow/entities/follow.entity';
+import { getPagination } from 'src/core/helper';
 
 @Injectable()
 export class UserService extends CrudService<User> {
@@ -88,7 +89,7 @@ export class UserService extends CrudService<User> {
     );
 
     // Lấy danh sách người dùng chưa theo dõi
-    const usersNotFollowed = await User.findAndCountAll({
+    const { rows, count } = await User.findAndCountAll({
       ...queryInfo,
       where: {
         [Op.and]: [
@@ -105,14 +106,12 @@ export class UserService extends CrudService<User> {
         ],
       },
     });
+
+    const pagination = getPagination(queryInfo.page, queryInfo.limit, count);
+
     return {
-      usersNotFollowed,
-      pagination: {
-        curentPage: queryInfo.page,
-        nextPage: queryInfo?.page + 1,
-        prevPage: queryInfo?.page - 1,
-        limit: queryInfo?.limit,
-      },
+      usersNotFollowed: rows,
+      pagination,
     };
   }
 }

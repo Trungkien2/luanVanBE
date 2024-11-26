@@ -92,7 +92,7 @@ export class AuthService {
       email,
     };
     const jwtString: string = await this.jwtService.signAsync(payload, {
-      expiresIn: '10m',
+      expiresIn: '180m',
       secret: process.env.JWT_SECRET || 'defaultSecretKey',
     });
 
