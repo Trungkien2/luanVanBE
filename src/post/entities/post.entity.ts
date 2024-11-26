@@ -36,10 +36,10 @@ export class Post extends Model<Post> {
   body: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.JSON,
     allowNull: false,
   })
-  media: string;
+  media: any[];
 
   @Column({
     type: DataType.TEXT,
