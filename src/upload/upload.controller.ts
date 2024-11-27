@@ -2,9 +2,10 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import {
@@ -76,6 +77,49 @@ export class UploadController {
     return {
       message: 'Image uploaded successfully',
       imageUrl: `http://localhost:5000/src/asset/images/${file.filename}`,
+    };
+  }
+  // Upload Images
+  @Post('images')
+  @ApiOperation({ summary: 'Upload multiple image files' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: 'Images uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid file types' })
+  @ApiBody({
+    description: 'Upload multiple image files',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      // Cho phép upload tối đa 10 files
+      storage: diskStorage({
+        destination: './src/asset/images', // Lưu vào thư mục 'images'
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter, // Đảm bảo chỉ upload file ảnh
+    }),
+  )
+  async uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
+    const uploadedFiles = files.map((file) => ({
+      filename: file.filename,
+      imageUrl: `http://localhost:5000/src/asset/images/${file.filename}`,
+    }));
+
+    return {
+      message: 'Images uploaded successfully',
+      files: uploadedFiles,
     };
   }
 
