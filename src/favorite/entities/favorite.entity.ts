@@ -62,4 +62,7 @@ export class Favorite extends Model<Favorite> {
 
   @BelongsTo(() => User)
   user: User;
+
+  @BelongsTo(() => Post)
+  post: Post;
 }

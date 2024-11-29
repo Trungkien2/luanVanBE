@@ -1,8 +1,9 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { FollowService } from './follow.service';
 import { CrudController } from 'src/core/Base/crud.controller';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
+import { CreateFollowDto } from './dto/create-follow.dto';
 
 @Controller('follow')
 @ApiTags('Follow')
@@ -11,5 +12,11 @@ import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
 export class FollowController extends CrudController<FollowService> {
   constructor(private readonly followService: FollowService) {
     super(followService);
+  }
+
+  @Post()
+  @ApiBody({ type: CreateFollowDto })
+  create(@Body() body: any) {
+    return this.followService.create(body);
   }
 }

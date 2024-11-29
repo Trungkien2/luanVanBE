@@ -7,6 +7,7 @@ import {
   HasMany,
   BelongsTo,
 } from 'sequelize-typescript';
+import { Favorite } from 'src/favorite/entities/favorite.entity';
 import { User } from 'src/user/user.entity';
 
 @Table({
@@ -20,7 +21,11 @@ export class Post extends Model<Post> {
     primaryKey: true,
   })
   id: string;
-
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  title: string;
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
@@ -71,4 +76,7 @@ export class Post extends Model<Post> {
 
   @BelongsTo(() => User)
   user: User;
+
+  @HasMany(() => Favorite, { as: 'favoriteList' })
+  favorites: Favorite[];
 }

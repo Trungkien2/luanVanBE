@@ -70,6 +70,7 @@ const sequelize = new Sequelize({
     beforeCreate: (item: any) => {
       const date = new Date();
       item.created_at_unix_timestamp = date.valueOf();
+      item.created_date_unix_timestamp = date.valueOf();
       item.updated_at_unix_timestamp = date.valueOf();
     },
     beforeBulkCreate(items: any[], options: SequelizeOptions) {
@@ -78,6 +79,7 @@ const sequelize = new Sequelize({
       for (const item of items) {
         if (!isBulkUpdate) {
           item.created_at_unix_timestamp = date.valueOf();
+          item.created_date_unix_timestamp = date.valueOf();
         }
         item.updated_at_unix_timestamp = date.valueOf();
       }
