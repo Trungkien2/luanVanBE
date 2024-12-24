@@ -11,6 +11,7 @@ import { EXCEPTION } from '../exception/exception';
 import { DatabaseException, RouterException } from '../exception';
 import { sequelize } from '../database/database.providers';
 import _ from 'lodash';
+import { getPagination } from '../helper';
 
 export interface ICrudExecOption {
   allowNull?: boolean;
@@ -25,7 +26,10 @@ export class CrudService<T extends Model<T>> {
   }
 
   async getList(queryInfo?: QueryInfoDto) {
-    return await this.exec(this.model.findAndCountAll<T>(queryInfo));
+    const res:any =await this.model.findAndCountAll<T>(queryInfo)
+    const pagination = getPagination(queryInfo.page, queryInfo.limit, res?.count);
+
+    return await this.exec({...res,pagination});
   }
   async getItem(queryInfo?: QueryInfoDto) {
     return await this.exec(this.model.findOne<T>(queryInfo), {

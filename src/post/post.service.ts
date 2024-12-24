@@ -6,6 +6,12 @@ import { FOLLOW_REPOSITORY, POST_REPOSITORY } from 'src/core/contants';
 import { Repository, Sequelize } from 'sequelize-typescript';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { Favorite } from 'src/favorite/entities/favorite.entity';
+import { Op } from 'sequelize';
+import { User } from 'src/user/user.entity';
+import { getPagination } from 'src/core/helper';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class PostService extends CrudService<Post> {
@@ -13,6 +19,7 @@ export class PostService extends CrudService<Post> {
     @Inject(POST_REPOSITORY) private readonly postRepository: Repository<Post>,
     @Inject(FOLLOW_REPOSITORY)
     private readonly followRepository: Repository<Follow>,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {
     super(Post);
   }
@@ -31,8 +38,6 @@ export class PostService extends CrudService<Post> {
     const userId = queryInfo?.where?.user_id;
     const limit = queryInfo?.limit;
     const offset = queryInfo?.offset;
-    const field = queryInfo.attributes;
-    console.log('🚀 ~ PostService ~ getPostByFollow ~ field:', field);
     const followedUserIds = await Follow.findAll({
       attributes: ['followed_user_id'],
       where: {
@@ -44,18 +49,44 @@ export class PostService extends CrudService<Post> {
     );
 
     if (followedIds?.length === 0) {
-      const post = await this.postRepository.findAll({
+      const countResult = await this.postRepository.count({
         logging: console.log,
+        include: [
+          {
+            model: User,
+            as: 'user',
+            required: false, // Không làm ảnh hưởng tới số lượng nếu không có user liên quan
+          },
+          {
+            model: Favorite,
+            as: 'favoriteList',
+            required: false,
+          },
+        ],
+      });
+      const post = await this.postRepository.findAll({
         attributes: [
           'id',
           'createdAt',
+          'body',
+          'media',
           [
             Sequelize.fn('COUNT', Sequelize.col('favoriteList.id')),
             'like_count',
           ],
           [
+            Sequelize.fn('COUNT', Sequelize.col('commentList.id')),
+            'comment_count',
+          ],
+          [
             Sequelize.literal(
-              `(COUNT(favoriteList.id) * 0.7) + ((NOW() - UNIX_TIMESTAMP(tbl_post.createdAt)) * 0.3)`,
+              `EXISTS(SELECT 1 FROM tbl_favorite WHERE tbl_favorite.post_id = Post.id AND tbl_favorite.user_id = ${userId})`,
+            ),
+            'isLiked',
+          ],
+          [
+            Sequelize.literal(
+              `(COUNT(favoriteList.id) * 0.7) + ((NOW() - UNIX_TIMESTAMP(Post.createdAt)) * 0.3)`,
             ),
             'score',
           ],
@@ -63,19 +94,221 @@ export class PostService extends CrudService<Post> {
         include: [
           {
             model: Favorite,
-            as: 'favoriteList', // Alias phải khớp với định nghĩa
+            as: 'favoriteList',
+            attributes: ['id'],
+            required: false,
+          },
+          {
+            model: Comment,
+            as: 'commentList',
             attributes: [],
           },
+          {
+            model: User,
+            as: 'user',
+            attributes: ['id', 'name', 'picture', 'email'],
+          },
         ],
-        group: ['tbl_post.id', 'tbl_post.createdAt'], // Khớp với các cột không tổng hợp
+        group: ['Post.id', 'Post.createdAt'],
         order: [[Sequelize.literal('score'), 'DESC']],
+        subQuery: false,
         limit,
         offset,
       });
-      return post;
-    } else {
+      const pagination = getPagination(queryInfo.page, limit, countResult);
+      return {
+        count: countResult, // Tổng số bài viết
+        rows: post,
+        pagination, // Danh sách bài viết
+      };
+    } else if (followedIds?.length > 0) {
+      const userPostsData = await this.postRepository.findAndCountAll({
+        logging: console.log,
+        attributes: [
+          'id',
+          'createdAt',
+          'body',
+          'media',
+          [
+            Sequelize.fn('COUNT', Sequelize.col('favoriteList.id')),
+            'like_count',
+          ],
+          [
+            Sequelize.fn('COUNT', Sequelize.col('commentList.id')),
+            'comment_count',
+          ],
+          [
+            Sequelize.literal(
+              `EXISTS(SELECT 1 FROM tbl_favorite WHERE tbl_favorite.post_id = Post.id AND tbl_favorite.user_id = ${userId})`,
+            ),
+            'isLiked',
+          ],
+          [
+            Sequelize.literal(
+              `(COUNT(favoriteList.id) * 0.7) + ((NOW() - UNIX_TIMESTAMP(Post.createdAt)) * 0.3)`,
+            ),
+            'score',
+          ],
+        ],
+        include: [
+          {
+            model: Favorite,
+            as: 'favoriteList',
+            attributes: [],
+          },
+          {
+            model: Comment,
+            as: 'commentList',
+            attributes: [],
+          },
+          {
+            model: User,
+            as: 'user',
+            attributes: ['id', 'name', 'picture', 'email'],
+          },
+        ],
+        where: {
+          user_id: userId, // Lấy bài viết của chính user
+        },
+        group: ['Post.id', 'Post.createdAt'],
+        order: [[Sequelize.literal('score'), 'DESC']],
+        subQuery: false,
+        limit: 3, // Lấy tối đa 3 bài viết của user
+      });
+
+      // Lấy bài viết của những người user đang follow
+      const followedPostsData = await this.postRepository.findAndCountAll({
+        logging: console.log,
+        attributes: [
+          'id',
+          'createdAt',
+          'body',
+          'media',
+          [
+            Sequelize.fn('COUNT', Sequelize.col('favoriteList.id')),
+            'like_count',
+          ],
+          [
+            Sequelize.fn('COUNT', Sequelize.col('commentList.id')),
+            'comment_count',
+          ],
+          [
+            Sequelize.literal(
+              `EXISTS(SELECT 1 FROM tbl_favorite WHERE tbl_favorite.post_id = Post.id AND tbl_favorite.user_id = ${userId})`,
+            ),
+            'isLiked',
+          ],
+          [
+            Sequelize.literal(
+              `(COUNT(favoriteList.id) * 0.7) + ((NOW() - UNIX_TIMESTAMP(Post.createdAt)) * 0.3)`,
+            ),
+            'score',
+          ],
+        ],
+        include: [
+          {
+            model: Favorite,
+            as: 'favoriteList',
+            attributes: [],
+          },
+          {
+            model: Comment,
+            as: 'commentList',
+            attributes: [],
+          },
+          {
+            model: User,
+            as: 'user',
+            attributes: ['id', 'name', 'picture', 'email'],
+          },
+        ],
+        where: {
+          user_id: {
+            [Op.in]: followedIds, // Lấy bài viết của những người user đang follow
+          },
+        },
+        group: ['Post.id', 'Post.createdAt'],
+        order: [[Sequelize.literal('score'), 'DESC']],
+        subQuery: false,
+        limit, // Giới hạn bài viết lấy ra theo yêu cầu
+        offset,
+      });
+
+      const allPosts = [...userPostsData.rows, ...followedPostsData.rows];
+      const totalCount =
+        userPostsData.count.length + followedPostsData.count.length;
+      const pagination = getPagination(queryInfo.page, limit, totalCount);
+
+      return {
+        totalCount,
+        rows: allPosts,
+        pagination,
+      };
     }
 
     return 'get posst by follow';
+  }
+
+  async getPostExplore(queryInfo?: QueryInfoDto) {
+    const limit = queryInfo?.limit;
+    const offset = queryInfo?.offset;
+    // 1. Lấy bài viết trending
+
+    // Key cache dựa trên limit và offset
+    const cacheKey = `explore:posts:limit=${limit}:offset=${offset}`;
+    const cacheData = await this.cacheService.get(cacheKey);
+    if (cacheData) {
+      return JSON.parse(cacheData as any);
+    }
+
+    const trendingPosts = await this.postRepository.findAndCountAll({
+      attributes: [
+        'id',
+        'media',
+        [
+          Sequelize.literal(
+            '(COUNT(favoriteList.id) * 0.6) + (COUNT(commentList.id) * 0.4)',
+          ),
+          'score',
+        ],
+      ],
+      include: [
+        {
+          model: Favorite,
+          as: 'favoriteList',
+          attributes: ['id'],
+          required: false,
+        },
+        {
+          model: Comment,
+          as: 'commentList',
+          attributes: [],
+        },
+        { model: User, as: 'user', attributes: ['id', 'name', 'picture'] },
+      ],
+      group: ['Post.id', 'Post.createdAt'],
+      order: [[Sequelize.literal('score'), 'DESC']],
+      where: { ...queryInfo.where },
+      subQuery: false,
+      limit,
+      offset,
+    });
+    const pagination = getPagination(
+      queryInfo.page,
+      limit,
+      trendingPosts.count.length,
+    );
+    const result = {
+      count: trendingPosts.count.length,
+      rows: trendingPosts.rows,
+      pagination,
+    };
+    // 3. Lưu kết quả vào cache với thời gian hết hạn (TTL)
+    await this.cacheService.set(
+      cacheKey,
+      JSON.stringify(result),
+      10 * 60 * 1000,
+    );
+    return result;
   }
 }

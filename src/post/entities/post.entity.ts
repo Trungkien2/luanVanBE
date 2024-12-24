@@ -7,6 +7,7 @@ import {
   HasMany,
   BelongsTo,
 } from 'sequelize-typescript';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { Favorite } from 'src/favorite/entities/favorite.entity';
 import { User } from 'src/user/user.entity';
 
@@ -79,4 +80,6 @@ export class Post extends Model<Post> {
 
   @HasMany(() => Favorite, { as: 'favoriteList' })
   favorites: Favorite[];
+  @HasMany(() => Comment, { as: 'commentList' })
+  comments: Comment[];
 }

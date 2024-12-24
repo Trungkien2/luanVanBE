@@ -65,4 +65,6 @@ export class Comment extends Model<Comment> {
 
   @BelongsTo(() => User)
   user: User;
+  @BelongsTo(() => Post)
+  post: Post;
 }
