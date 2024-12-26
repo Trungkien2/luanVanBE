@@ -265,6 +265,7 @@ export class PostService extends CrudService<Post> {
       attributes: [
         'id',
         'media',
+        "status" ,
         [
           Sequelize.literal(
             '(COUNT(favoriteList.id) * 0.6) + (COUNT(commentList.id) * 0.4)',
@@ -288,7 +289,7 @@ export class PostService extends CrudService<Post> {
       ],
       group: ['Post.id', 'Post.createdAt'],
       order: [[Sequelize.literal('score'), 'DESC']],
-      where: { ...queryInfo.where },
+      where: { ...queryInfo.where,status : "POST" },
       subQuery: false,
       limit,
       offset,
@@ -310,5 +311,75 @@ export class PostService extends CrudService<Post> {
       10 * 60 * 1000,
     );
     return result;
+  }
+
+  async getReelPosts(queryInfo?: QueryInfoDto) {
+    const limit = parseInt(queryInfo?.limit as any, 10) || 10;
+    const offset = parseInt(queryInfo?.offset as any, 10) || 0;
+    let whereCondition = { ...queryInfo.where, status: 'REEL' };
+    if(queryInfo?.filterType === 'following'){
+      const followedUserIds = await this.followRepository.findAll({
+        attributes: ['followed_user_id'],
+        where: {
+          following_user_id: queryInfo.where?.user_id,
+        },
+      });
+      const followedIds = followedUserIds.map(follow => follow.followed_user_id);
+      whereCondition = { ...whereCondition, user_id: { [Op.in]: followedIds } };
+    }
+
+    if (queryInfo?.name) {
+      whereCondition = {
+        ...whereCondition,
+        '$user.name$': { [Op.like]: `%${queryInfo.name}%` },
+      };
+    }
+
+    const reelPosts = await this.postRepository.findAndCountAll({
+      attributes: [
+        'id',
+        'media',
+        'status',
+        "body",
+        [
+          Sequelize.literal(
+            '(COUNT(favoriteList.id) * 0.6) + (COUNT(commentList.id) * 0.4)',
+          ),
+          'score',
+        ],
+      ],
+      include: [
+        {
+          model: Favorite,
+          as: 'favoriteList',
+          attributes: ['id'],
+          required: false,
+        },
+        {
+          model: Comment,
+          as: 'commentList',
+          attributes: [],
+        },
+        { model: User, as: 'user', attributes: ['id', 'name', 'picture'] },
+      ],
+      group: ['Post.id', 'Post.createdAt'],
+      order: [[Sequelize.literal('score'), 'DESC']],
+      where:whereCondition,
+      subQuery: false,
+      limit,
+      offset,
+    });
+
+    const pagination = getPagination(
+      queryInfo.page,
+      limit,
+      reelPosts.count.length,
+    );
+
+    return {
+      count: reelPosts.count.length,
+      rows: reelPosts.rows,
+      pagination,
+    };
   }
 }
