@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -49,6 +50,13 @@ export class PostController extends CrudController<PostService> {
   @ApiQueryInfo()
   async getPostExplore(@QueryInfo() queryInfo: QueryInfoDto, @Req() req: any) {
     return this.postService.getPostExplore(queryInfo);
+  }
+
+  @Get('reels')
+  async getReelPosts(@Query() queryInfo: QueryInfoDto, @Req() req: any) {
+    const userId = req.user.userId;
+    queryInfo.where = { ...queryInfo.where, user_id: userId };
+    return this.postService.getReelPosts(queryInfo);
   }
 
   @Delete(':postId/like') // Endpoint: DELETE /posts/:postId/like

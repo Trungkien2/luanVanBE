@@ -154,7 +154,7 @@ export class UploadController {
   async uploadVideo(@UploadedFile() file: Express.Multer.File) {
     return {
       message: 'Video uploaded successfully',
-      videoUrl: `/src/asset/videos/${file.filename}`,
+      videoUrl: `http://localhost:5000/src/asset/videos/${file.filename}`,
     };
   }
 }
