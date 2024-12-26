@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwtGuard';
 import { CrudController } from 'src/core/Base/crud.controller';
@@ -41,5 +49,10 @@ export class UserController extends CrudController<UserService> {
     const userId = req.user.userId; // Lấy userId từ req.user
     queryInfo.where = { ...queryInfo.where, user_id: userId };
     return this.userService.getUserUnfollow(queryInfo);
+  }
+
+  @Get(':id/details')
+  async getUserDetails(@Param('id') id: number) {
+    return this.userService.getUserDetails(id);
   }
 }

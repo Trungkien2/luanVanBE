@@ -75,9 +75,9 @@ export class User extends Model<User> {
   @HasMany(() => Post)
   posts: Post[];
 
-  @HasMany(() => Follow, 'following_user_id')
-  following: Follow[];
+  @HasMany(() => Follow, { foreignKey: 'following_user_id', as: 'followings' })
+  followings: Follow[];
 
-  @HasMany(() => Follow, 'followed_user_id')
+  @HasMany(() => Follow, { foreignKey: 'followed_user_id', as: 'followers' })
   followers: Follow[];
 }

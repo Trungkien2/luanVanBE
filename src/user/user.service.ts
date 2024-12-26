@@ -10,6 +10,7 @@ import { Op, Transaction } from 'sequelize';
 import { QueryInfoDto } from 'src/core/interface/query-info.dto';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { getPagination } from 'src/core/helper';
+import { Post } from 'src/post/entities/post.entity'; // Import Post entity
 
 @Injectable()
 export class UserService extends CrudService<User> {
@@ -112,6 +113,47 @@ export class UserService extends CrudService<User> {
     return {
       usersNotFollowed: rows,
       pagination,
+    };
+  }
+
+  async getUserDetails(userId: number): Promise<any> {
+    const user = await this.userRepository.findByPk(userId, {
+      include: [
+        {
+          model: Follow,
+          as: 'followers',
+          attributes: ['id'],
+        },
+        {
+          model: Follow,
+          as: 'followings',
+          attributes: ['id'],
+        },
+        {
+          model: Post,
+          as: 'posts',
+          attributes: ['id'],
+        },
+      ],
+    });
+
+    if (!user) {
+      throw new BaseException(
+        EXCEPTION.USER_NOT_FOUND,
+        'user',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const totalPosts = user.posts.length;
+    const totalFollowers = user.followers.length;
+    const totalFollowings = user.followings.length;
+
+    return {
+      user,
+      totalPosts,
+      totalFollowers,
+      totalFollowings,
     };
   }
 }
