@@ -1,4 +1,4 @@
-import { Body, Delete, Get, Logger, Param, Post, Put } from '@nestjs/common';
+import { Body, Delete, Get, Logger, Param, Post, Put, Req } from '@nestjs/common';
 
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
@@ -23,7 +23,7 @@ export class CrudController<T extends CrudService<any>> {
   @Public()
   @ApiQueryInfo()
   @Get(':id')
-  async getItem(@Param('id') id: string, @QueryInfo() queryInfo: QueryInfoDto) {
+  async getItem(@Param('id') id: string, @QueryInfo() queryInfo: QueryInfoDto, @Req() req?: any) {
     queryInfo.where.id = id;
     return await this.service.getItem(queryInfo);
   }

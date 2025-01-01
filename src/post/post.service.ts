@@ -70,6 +70,7 @@ export class PostService extends CrudService<Post> {
           'createdAt',
           'body',
           'media',
+          "status",
           [
             Sequelize.fn('COUNT', Sequelize.col('favoriteList.id')),
             'like_count',
@@ -112,6 +113,7 @@ export class PostService extends CrudService<Post> {
         group: ['Post.id', 'Post.createdAt'],
         order: [[Sequelize.literal('score'), 'DESC']],
         subQuery: false,
+        where: { status : "POST" },
         limit,
         offset,
       });
@@ -169,10 +171,12 @@ export class PostService extends CrudService<Post> {
         ],
         where: {
           user_id: userId, // Lấy bài viết của chính user
+           status : "POST"
         },
         group: ['Post.id', 'Post.createdAt'],
         order: [[Sequelize.literal('score'), 'DESC']],
         subQuery: false,
+      
         limit: 3, // Lấy tối đa 3 bài viết của user
       });
 
@@ -226,6 +230,7 @@ export class PostService extends CrudService<Post> {
           user_id: {
             [Op.in]: followedIds, // Lấy bài viết của những người user đang follow
           },
+          status : "POST" ,
         },
         group: ['Post.id', 'Post.createdAt'],
         order: [[Sequelize.literal('score'), 'DESC']],
@@ -250,17 +255,20 @@ export class PostService extends CrudService<Post> {
   }
 
   async getPostExplore(queryInfo?: QueryInfoDto) {
+    
     const limit = queryInfo?.limit;
     const offset = queryInfo?.offset;
     // 1. Lấy bài viết trending
-
+    
     // Key cache dựa trên limit và offset
-    const cacheKey = `explore:posts:limit=${limit}:offset=${offset}`;
-    const cacheData = await this.cacheService.get(cacheKey);
-    if (cacheData) {
-      return JSON.parse(cacheData as any);
-    }
+    // const cacheKey = `explore:posts:limit=${limit}:offset=${offset}`;
+    // const cacheData = await this.cacheService.get(cacheKey);
+    // if (cacheData) {
+    //   console.log('Cache hit');
+    //   return JSON.parse(cacheData as any);
+    // }
 
+    console.log('Cache miss, querying database');
     const trendingPosts = await this.postRepository.findAndCountAll({
       attributes: [
         'id',
@@ -277,8 +285,7 @@ export class PostService extends CrudService<Post> {
         {
           model: Favorite,
           as: 'favoriteList',
-          attributes: ['id'],
-          required: false,
+          attributes: [],
         },
         {
           model: Comment,
@@ -294,6 +301,8 @@ export class PostService extends CrudService<Post> {
       limit,
       offset,
     });
+
+    console.log('Database query completed');
     const pagination = getPagination(
       queryInfo.page,
       limit,
@@ -305,15 +314,16 @@ export class PostService extends CrudService<Post> {
       pagination,
     };
     // 3. Lưu kết quả vào cache với thời gian hết hạn (TTL)
-    await this.cacheService.set(
-      cacheKey,
-      JSON.stringify(result),
-      10 * 60 * 1000,
-    );
+    // await this.cacheService.set(
+    //   cacheKey,
+    //   JSON.stringify(result),
+    //   10 * 60 * 1000,
+    // );
+    console.log('Result cached');
     return result;
   }
 
-  async getReelPosts(queryInfo?: QueryInfoDto) {
+  async getReelPosts(queryInfo?: QueryInfoDto, userId?: number) {
     const limit = parseInt(queryInfo?.limit as any, 10) || 10;
     const offset = parseInt(queryInfo?.offset as any, 10) || 0;
     let whereCondition = { ...queryInfo.where, status: 'REEL' };
@@ -321,7 +331,8 @@ export class PostService extends CrudService<Post> {
       const followedUserIds = await this.followRepository.findAll({
         attributes: ['followed_user_id'],
         where: {
-          following_user_id: queryInfo.where?.user_id,
+          following_user_id: userId,
+          status : "ACCEPT"
         },
       });
       const followedIds = followedUserIds.map(follow => follow.followed_user_id);
@@ -381,5 +392,64 @@ export class PostService extends CrudService<Post> {
       rows: reelPosts.rows,
       pagination,
     };
+  }
+
+  async countLikes(postId: string): Promise<number> {
+    return await this.postRepository.count({
+      include: [
+        {
+          model: Favorite,
+          as: 'favoriteList',
+          where: { post_id: postId },
+          required: true,
+        },
+      ],
+    });
+  }
+
+  async countComments(postId: string): Promise<number> {
+    return await this.postRepository.count({
+      include: [
+        {
+          model: Comment,
+          as: 'commentList',
+          where: { post_id: postId },
+          required: true,
+        },
+      ],
+    });
+  }
+
+  async isPostLikedByUser(postId: string, userId: string): Promise<boolean> {
+    const count = await this.postRepository.count({
+      include: [
+        {
+          model: Favorite,
+          as: 'favoriteList',
+          where: { post_id: postId, user_id: userId },
+          required: true,
+        },
+      ],
+    });
+    return count > 0;
+  }
+
+  async delete(queryInfo: QueryInfoDto): Promise<any> {
+    const postId = queryInfo.where.id;
+
+    // Delete related favorites
+    await Favorite.destroy({
+      where: { post_id: postId },
+    });
+
+    // Delete related comments
+    await Comment.destroy({
+      where: { post_id: postId },
+    });
+
+    // Delete the post
+    return await this.postRepository.destroy({
+      where: { id: postId },
+    });
   }
 }

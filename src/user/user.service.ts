@@ -6,7 +6,7 @@ import { FOLLOW_REPOSITORY, USER_REPOSITORY } from 'src/core/contants';
 import { BaseException } from 'src/core/exception';
 import { EXCEPTION } from 'src/core/exception/exception';
 import { User } from './user.entity';
-import { Op, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import { QueryInfoDto } from 'src/core/interface/query-info.dto';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { getPagination } from 'src/core/helper';
@@ -79,6 +79,7 @@ export class UserService extends CrudService<User> {
     return 'profile';
   }
   async getUserUnfollow(queryInfo?: QueryInfoDto) {
+    console.log("🚀 ~ UserService ~ getUserUnfollow ~ queryInfo:", queryInfo)
     const followedUserIds = await Follow.findAll({
       attributes: ['followed_user_id'],
       where: {
@@ -89,23 +90,29 @@ export class UserService extends CrudService<User> {
       (follow) => follow.followed_user_id,
     );
 
+    const whereCondition: any = {
+      [Op.and]: [
+        {
+          id: {
+            [Op.notIn]: followedIds, // Người dùng không nằm trong danh sách đã theo dõi
+          },
+        },
+        {
+          id: {
+            [Op.ne]: queryInfo.where?.user_id, // Loại bỏ chính user hiện tại
+          },
+        },
+      ],
+    };
+
+    if (queryInfo?.name) {
+      whereCondition.name = { [Op.like]: `%${queryInfo.name}%` };
+    }
+
     // Lấy danh sách người dùng chưa theo dõi
     const { rows, count } = await User.findAndCountAll({
       ...queryInfo,
-      where: {
-        [Op.and]: [
-          {
-            id: {
-              [Op.notIn]: followedIds, // Người dùng không nằm trong danh sách đã theo dõi
-            },
-          },
-          {
-            id: {
-              [Op.ne]: queryInfo.where?.user_id, // Loại bỏ chính user hiện tại
-            },
-          },
-        ],
-      },
+      where: whereCondition,
     });
 
     const pagination = getPagination(queryInfo.page, queryInfo.limit, count);
@@ -116,18 +123,44 @@ export class UserService extends CrudService<User> {
     };
   }
 
-  async getUserDetails(userId: number): Promise<any> {
+  async getUserDetails(userId: number, tokenUserId: number): Promise<any> {
     const user = await this.userRepository.findByPk(userId, {
+      attributes: [
+        'id',
+        'email',
+        'name',
+        'picture',
+        'user_name',
+        'bio',
+        [
+          Sequelize.literal(
+            `(SELECT COUNT(*) FROM tbl_follow WHERE (tbl_follow.following_user_id = ${tokenUserId} AND tbl_follow.followed_user_id = User.id AND tbl_follow.status = 'ACCEPT') OR (tbl_follow.following_user_id = User.id AND tbl_follow.followed_user_id = ${tokenUserId} AND tbl_follow.status = 'ACCEPT')) > 0`,
+          ),
+          'isFollow',
+        ],
+        [
+          Sequelize.literal(
+            `(SELECT COUNT(*) FROM tbl_follow WHERE tbl_follow.following_user_id = ${tokenUserId} AND tbl_follow.followed_user_id = User.id AND tbl_follow.status = 'PENDING') > 0`,
+          ),
+          'isRequestSent',
+        ],
+        [
+          Sequelize.literal(
+            `(SELECT COUNT(*) FROM tbl_follow WHERE tbl_follow.followed_user_id = ${tokenUserId} AND tbl_follow.following_user_id = User.id AND tbl_follow.status = 'PENDING') > 0`,
+          ),
+          'isRequestReceived',
+        ],
+      ],
       include: [
         {
           model: Follow,
           as: 'followers',
-          attributes: ['id'],
+          attributes: ['id', 'status',"following_user_id","followed_user_id"],
         },
         {
           model: Follow,
           as: 'followings',
-          attributes: ['id'],
+          attributes: ['id', 'status',"following_user_id","followed_user_id"],
         },
         {
           model: Post,
@@ -146,8 +179,8 @@ export class UserService extends CrudService<User> {
     }
 
     const totalPosts = user.posts.length;
-    const totalFollowers = user.followers.length;
-    const totalFollowings = user.followings.length;
+    const totalFollowers = user.followers?.filter((item) => item.status === 'ACCEPT').length;
+    const totalFollowings = user.followings?.filter((item) => item.status === 'ACCEPT').length;
 
     return {
       user,

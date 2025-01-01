@@ -15,7 +15,7 @@ const operatorsAliases = {
   $in: Op.in,
   $notIn: Op.notIn,
   $is: Op.is,
-  $like: Op.like,
+  $like: [Op.like],
   $notLike: Op.notLike,
   $iLike: Op.iLike,
   $notILike: Op.notILike,
@@ -88,7 +88,7 @@ const sequelize = new Sequelize({
       item.updated_at_unix_timestamp = new Date().valueOf();
     },
     beforeDestroy: (item: any) => {
-      item.deleted_at_unix_timestamp = new Date().valueOf();
+      item.deleted_date = new Date();
     },
   },
   operatorsAliases,

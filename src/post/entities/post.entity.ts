@@ -6,9 +6,11 @@ import {
   ForeignKey,
   HasMany,
   BelongsTo,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Favorite } from 'src/favorite/entities/favorite.entity';
+import { PostVisibility } from 'src/post_visibility/entities/post_visibility.entity';
 import { User } from 'src/user/user.entity';
 
 @Table({
@@ -54,6 +56,13 @@ export class Post extends Model<Post> {
   status: string;
 
   @Column({
+    type: DataType.ENUM('public', 'private', 'followers'),
+    allowNull: false,
+    defaultValue: 'public',
+  })
+  visibility: string;
+
+  @Column({
     type: DataType.BIGINT,
     validate: {
       min: 0,
@@ -82,4 +91,7 @@ export class Post extends Model<Post> {
   favorites: Favorite[];
   @HasMany(() => Comment, { as: 'commentList' })
   comments: Comment[];
+
+  @BelongsToMany(() => User, () => PostVisibility)
+  allowedUsers: User[];
 }

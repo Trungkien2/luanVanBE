@@ -31,6 +31,7 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { MessageModule } from './message/message.module';
 import { MessageReadsModule } from './message_reads/message_reads.module';
 import { ConversationMembersModule } from './conversation_members/conversation_members.module';
+import { PostVisibilityModule } from './post_visibility/post_visibility.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ConversationMembersModule } from './conversation_members/conversation_m
     MessageModule,
     MessageReadsModule,
     ConversationMembersModule,
+    PostVisibilityModule,
   ],
   controllers: [AppController],
   providers: [

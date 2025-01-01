@@ -53,7 +53,7 @@ export class AuthController {
   googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user;
 
-    res.redirect('http://localhost:3000?user=' + JSON.stringify(user));
+    res.redirect('http://localhost:3000/login-google?user=' + JSON.stringify(user));
   }
 
   @Post('send-otp')

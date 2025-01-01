@@ -59,6 +59,19 @@ export class Follow extends Model<Follow> {
   })
   deleted_date: Date;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    defaultValue: "PENDING",
+    validate: {
+      isIn: {
+        args: [["PENDING", "ACCEPT", "DENY"]],
+        msg: "Status must be one of 'PENDING', 'ACCEPT', or 'DENY'.",
+      },
+    },
+  })
+  status: string;
+  
   @BelongsTo(() => User, 'following_user_id')
   followerUser: User;
 

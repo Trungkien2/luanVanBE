@@ -50,9 +50,10 @@ export class UserController extends CrudController<UserService> {
     queryInfo.where = { ...queryInfo.where, user_id: userId };
     return this.userService.getUserUnfollow(queryInfo);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get(':id/details')
-  async getUserDetails(@Param('id') id: number) {
-    return this.userService.getUserDetails(id);
+  async getUserDetails(@Param('id') id: number, @Req() req: any) {
+    const userId = req.user.userId;
+    return this.userService.getUserDetails(id,userId);
   }
 }
