@@ -50,6 +50,7 @@ export class PostController extends CrudController<PostService> {
   @Get('/explore')
   @ApiQueryInfo()
   async getPostExplore(@QueryInfo() queryInfo: QueryInfoDto, @Req() req: any) {
+    console.log("🚀 ~ PostController ~ getPostExplore ~ queryInfo:", queryInfo)
     
     return this.postService.getPostExplore(queryInfo);
   }

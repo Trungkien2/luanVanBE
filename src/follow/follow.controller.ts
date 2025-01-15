@@ -24,17 +24,23 @@ export class FollowController extends CrudController<FollowService> {
   async followUser(@Param('followingUserId') followingUserId: number, @Req() req: any) {
     const followedId = req.user.userId;
     return this.followService.accept(followingUserId, followedId);
- 
   }
+
   @Post('deny/:followingUserId')
   async denyUser(@Param('followingUserId') followingUserId: number, @Req() req: any) {
     const followedId = req.user.userId;
     return this.followService.unfollowUser(followingUserId, followedId);
- 
   }
+
   @Delete(':followedUserId')
   async unfollowUser(@Param('followedUserId') followedUserId: number, @Req() req: any) {
     const followingUserId = req.user.userId;
     return this.followService.unfollowUser(followingUserId, followedUserId);
+  }
+
+  @Get('friends')
+  async getFriends(@Req() req: any) {
+    const userId = req.user.userId;
+    return this.followService.getFriends(userId);
   }
 }

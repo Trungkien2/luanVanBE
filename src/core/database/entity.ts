@@ -12,3 +12,6 @@ export * from 'src/message/entities/message.entity';
 export * from 'src/message_reads/entities/message_read.entity';
 export * from 'src/conversation_members/entities/conversation_member.entity';
 export * from 'src/post_visibility/entities/post_visibility.entity';
+export * from 'src/hashtag/entities/hashtag.entity';
+export * from 'src/post_hashtag/entities/post_hashtag.entity';
+export * from 'src/notification/entities/notification.entity';

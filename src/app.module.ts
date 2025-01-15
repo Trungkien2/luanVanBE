@@ -32,6 +32,9 @@ import { MessageModule } from './message/message.module';
 import { MessageReadsModule } from './message_reads/message_reads.module';
 import { ConversationMembersModule } from './conversation_members/conversation_members.module';
 import { PostVisibilityModule } from './post_visibility/post_visibility.module';
+import { HashtagModule } from './hashtag/hashtag.module';
+import { PostHashtagModule } from './post_hashtag/post_hashtag.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -60,6 +63,9 @@ import { PostVisibilityModule } from './post_visibility/post_visibility.module';
     MessageReadsModule,
     ConversationMembersModule,
     PostVisibilityModule,
+    HashtagModule,
+    PostHashtagModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

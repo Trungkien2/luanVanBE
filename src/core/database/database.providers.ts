@@ -15,7 +15,7 @@ const operatorsAliases = {
   $in: Op.in,
   $notIn: Op.notIn,
   $is: Op.is,
-  $like: [Op.like],
+  $like: Op.like,
   $notLike: Op.notLike,
   $iLike: Op.iLike,
   $notILike: Op.notILike,

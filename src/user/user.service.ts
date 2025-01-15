@@ -79,27 +79,33 @@ export class UserService extends CrudService<User> {
     return 'profile';
   }
   async getUserUnfollow(queryInfo?: QueryInfoDto) {
-    console.log("🚀 ~ UserService ~ getUserUnfollow ~ queryInfo:", queryInfo)
-    const followedUserIds = await Follow.findAll({
-      attributes: ['followed_user_id'],
+    const userId = queryInfo.where?.user_id;
+
+    // Get the list of user IDs that the user is friends with
+    const friends = await Follow.findAll({
+      attributes: ['following_user_id', 'followed_user_id'],
       where: {
-        following_user_id: queryInfo.where?.user_id, // Lấy danh sách những người dùng đã được user này theo dõi
+        [Op.or]: [
+          { following_user_id: userId, status: 'ACCEPT' },
+          { followed_user_id: userId, status: 'ACCEPT' },
+        ],
       },
     });
-    const followedIds = followedUserIds.map(
-      (follow) => follow.followed_user_id,
+
+    const friendIds = friends.map((friend) =>
+      friend.following_user_id === userId ? friend.followed_user_id : friend.following_user_id,
     );
 
     const whereCondition: any = {
       [Op.and]: [
         {
           id: {
-            [Op.notIn]: followedIds, // Người dùng không nằm trong danh sách đã theo dõi
+            [Op.notIn]: friendIds, // Người dùng không nằm trong danh sách bạn bè
           },
         },
         {
           id: {
-            [Op.ne]: queryInfo.where?.user_id, // Loại bỏ chính user hiện tại
+            [Op.ne]: userId, // Loại bỏ chính user hiện tại
           },
         },
       ],

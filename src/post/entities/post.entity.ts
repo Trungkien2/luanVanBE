@@ -10,6 +10,8 @@ import {
 } from 'sequelize-typescript';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Favorite } from 'src/favorite/entities/favorite.entity';
+import { Hashtag } from 'src/hashtag/entities/hashtag.entity';
+import { PostHashtag } from 'src/post_hashtag/entities/post_hashtag.entity';
 import { PostVisibility } from 'src/post_visibility/entities/post_visibility.entity';
 import { User } from 'src/user/user.entity';
 
@@ -94,4 +96,7 @@ export class Post extends Model<Post> {
 
   @BelongsToMany(() => User, () => PostVisibility)
   allowedUsers: User[];
+
+  @BelongsToMany(() => Hashtag, () => PostHashtag)
+  hashtags: Hashtag[];
 }

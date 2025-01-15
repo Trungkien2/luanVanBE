@@ -21,14 +21,22 @@ export class QueryMiddleware implements NestMiddleware {
     // if (fields.attributes != undefined) {
     //   fields.attributes = _.union(['id', 'created_at', 'updated_at'], fields.attributes);
     // }
-
+    const customFields = {};
+    if(req.query['hashtag']){
+      customFields['hashtag'] = req.query['hashtag'];
+    }
+    if(req.query['name']){
+      customFields['name'] = req.query['name'];
+    }
+  
     req.queryInfo = _.merge(
       {
-        where,
+        where,  
         limit,
         page,
         offset,
         order,
+       ...customFields
       },
       fields,
     );
